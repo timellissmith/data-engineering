@@ -31,6 +31,9 @@ ipython = "^8.7.0"
 pre-commit = "^2.20.0"
 
 
+[tool.poetry.group.dev.dependencies]
+commitizen = "^3.29.0"
+
 [tool.coverage.paths]
 source = ["cts_data_engineering"]
 
@@ -40,3 +43,10 @@ source = ["cts_data_engineering"]
 
 [tool.coverage.report]
 show_missing = true
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "$version"
+version_scheme = "pep440"
+version_provider = "poetry"
+update_changelog_on_bump = true
