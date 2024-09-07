@@ -62,13 +62,6 @@ Current dags include:
 
 - This is a demo of using the CDK to deploy tables from metadata. It uses the metadata defined in the metadata folder to create buckets and datasets.
 
-### PySpark
-
-There is pyspark code configured in the pyspark directory. This is currently only for the purpose of loading CSV files into BigQuery
-
-This can be triggered from within airflow (see the census_public_census_v1 dag)
-Code can be deployed using the pyspark build command.
-
 ### DBT
 
 DBT models. Models can be generated directly from metadata using the `make dbt_create_models`. Currently, this just creates a view with redacted pii data.
