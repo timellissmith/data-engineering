@@ -25,9 +25,6 @@ dbt_create_models:  ## Create DBT models from metadata
 create_new_branch: ## Create a new branch for hotfix, bugfixes or features
 	@scripts/create_new_branch.sh
 
-run_terraform:  ## Run a terraform deploy
-	cd terraform_cdk; PYTHONPATH=${CURRENTDIR} cdktf deploy
-
 run_precommit_checks:  ## Run pre-commit checks
 	@pre-commit run --all-files
 
