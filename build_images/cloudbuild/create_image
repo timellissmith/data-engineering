@@ -1,0 +1,7 @@
+#!/bin/bash
+set -eu
+
+cp ../../.pre-commit-config.yaml .
+docker build . -t "eu.gcr.io/tp-bi-dlake-dev-util-d215/cloudbuild"
+docker push "eu.gcr.io/tp-bi-dlake-dev-util-d215/cloudbuild"
+rm .pre-commit-config.yaml

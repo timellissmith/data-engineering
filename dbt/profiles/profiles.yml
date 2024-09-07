@@ -1,0 +1,61 @@
+default:
+  target: local-dev
+  outputs:
+    local-dev:
+      type: bigquery
+      project: "{{ env_var('GCP_PROJECT') }}"
+      method: oauth
+      threads: 1
+      schema: census_public
+      timeout_seconds: 300
+      location: europe-west2
+      priority: interactive
+      retries: 1
+    unit-test:
+      type: bigquery
+      project: "{{ env_var('GCP_PROJECT') }}"
+      method: oauth
+      threads: 1
+      schema: unit_tests
+      timeout_seconds: 300
+      location: europe-west2 # Optional, one of europe-west2 or europe-west2
+      priority: interactive
+    integration-test:
+      type: bigquery
+      project: "{{ env_var('GCP_PROJECT') }}"
+      method: oauth
+      threads: 1
+      schema: integration_tests
+      timeout_seconds: 300
+      location: europe-west2 # Optional, one of europe-west2 or europe-west2
+    airflow-local:
+      project: "{{ env_var('GCP_PROJECT') }}"
+      method: oauth
+      type: bigquery
+      threads: 1
+      schema: default
+      timeout_seconds: 300
+      location: europe-west2 # Optional, one of europe-west2 or europe-west2
+      priority: interactive
+      retries: 1
+    composer:
+      project: "{{ env_var('GCP_PROJECT') }}"
+      type: bigquery
+      method: service-account
+      threads: 1
+      schema: default
+      keyfile: /var/secrets/google/key.json
+      timeout_seconds: 300
+      location: europe-west2
+      priority: interactive
+      retries: 1
+    cloudbuild:
+      project: "{{ env_var('GCP_PROJECT') }}"
+      type: bigquery
+      method: oauth
+      threads: 1
+      schema: default
+      timeout_seconds: 300
+      location: europe-west2 # Optional, one of europe-west2 or europe-west2
+      priority: interactive
+      retries: 1

@@ -1,0 +1,42 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "cts_data_engineering"
+version = "0.1.0"
+description = "Python package build from cookiecutter"
+authors = ["CTS"]
+license = "MIT"
+
+[tool.poetry.scripts]
+"cts_data_engineering" = "cts_data_engineering:main"
+
+[tool.poetry.dependencies]
+python = ">=3.12"
+fire = "^0.6.0"
+pyyaml = "^6.0.2"
+attrs = "^24.2.0"
+cattrs = "^24.1.0"
+pendulum = "^3.0.0"
+dbt-bigquery = "^1.8.2"
+
+[tool.poetry.dev-dependencies]
+black = "^21.6b0"
+autopep8 = "^1.5.7"
+pytest = "^6.2.4"
+coverage = {extras = ["toml"], version = "^5.5"}
+pytest-cov = "^2.12.1"
+ipython = "^8.7.0"
+pre-commit = "^2.20.0"
+
+
+[tool.coverage.paths]
+source = ["cts_data_engineering"]
+
+[tool.coverage.run]
+branch = true
+source = ["cts_data_engineering"]
+
+[tool.coverage.report]
+show_missing = true

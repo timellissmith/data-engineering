@@ -1,0 +1,33 @@
+models:
+- columns:
+  - description: reference_key
+    name: key
+  - description: Total Population
+    name: population
+  - description: Female population
+    name: population_female
+  - description: Population under 10
+    name: population_age_00_09
+  - description: Population between 10 and 20
+    name: population_age_10_19
+  - description: Population between 20 and 30
+    name: population_age_20_29
+  - description: Population between 30 and 40
+    name: population_age_30_39
+  - description: Population between 40 and 50
+    name: population_age_40_49
+  - description: Population between 50 and 60
+    name: population_age_50_59
+  - description: Population between 60 and 70
+    name: population_age_60_69
+  - description: Population between 70 and 80
+    name: population_age_70_79
+  - description: Population over 80
+    name: population_age_80_and_older
+  config:
+    alias: census_v1
+    materialized: view
+    schema: census_public_restricted
+  description: census with PII redacted
+  name: census_public_census_v1_filter_pii_data
+version: 2

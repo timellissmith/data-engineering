@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+set -x
+set -eu
+
+if [ -z ${LOCAL_DAGS_FOLDER+x} ];
+  then echo "LOCAL_DAGS_FOLDER is unset" && exit 1;
+  else echo "LOCAL_DAGS_FOLDER is set to '$LOCAL_DAGS_FOLDER'";
+fi
+
+if [ -z ${CREDENTIALS_PATH+x} ];
+  then echo "CREDENTIALS_PATH is unset" && exit 1;
+  else echo "CREDENTIALS_PATH is set to '$CREDENTIALS_PATH'";
+fi
+
+if [ -z ${LOCAL_METADATA_FOLDER+x} ];
+  then echo "LOCAL_METADATA_FOLDER is unset" && exit 1;
+  else echo "LOCAL_METADATA_FOLDER is set to '$LOCAL_METADATA_FOLDER'";
+fi
+
+
+if [[ $(uname -a | grep arm64) ]]; then
+  docker buildx build --platform linux/arm64 -t airflow_local:latest . --build-arg AIRFLOW_TAG=${AIRFLOW_TAG}
+  docker buildx build --platform linux/arm64 -t dbt_local:latest ../../build_images/dbt
+else
+  docker buildx build -t airflow_local:latest . --build-arg AIRFLOW_TAG=${AIRFLOW_TAG}
+  docker buildx build -t dbt_local:latest ../../build_images/dbt
+fi
+
+cp kind-cluster-template.yaml kind-cluster.yaml
+cp values-template.yaml values.yaml
+
+## SET MOUNT PATH TO $LOCAL_DAGS_FOLDER
+yq -i "
+.nodes[1].extraMounts[1].hostPath = \"$LOCAL_DAGS_FOLDER\" |
+.nodes[1].extraMounts[1].containerPath = \"/tmp/dags/pipelines\"  |
+.nodes[2].extraMounts[1].hostPath = \"$LOCAL_DAGS_FOLDER\" |
+.nodes[2].extraMounts[1].containerPath = \"/tmp/dags/pipelines\"  |
+.nodes[3].extraMounts[1].hostPath = \"$LOCAL_DAGS_FOLDER\" |
+.nodes[3].extraMounts[1].containerPath = \"/tmp/dags/pipelines\" |
+.nodes[1].extraMounts[2].hostPath = \"$CREDENTIALS_PATH\" |
+.nodes[1].extraMounts[2].containerPath = \"/tmp/credentials\"  |
+.nodes[2].extraMounts[2].hostPath = \"$CREDENTIALS_PATH\" |
+.nodes[2].extraMounts[2].containerPath = \"/tmp/credentials\"  |
+.nodes[3].extraMounts[2].hostPath = \"$CREDENTIALS_PATH\"  |
+.nodes[3].extraMounts[2].containerPath = \"/tmp/credentials\" |
+.nodes[1].extraMounts[3].hostPath = \"$LOCAL_METADATA_FOLDER\" |
+.nodes[1].extraMounts[3].containerPath = \"/tmp/dags/metadata\"  |
+.nodes[2].extraMounts[3].hostPath = \"$LOCAL_METADATA_FOLDER\" |
+.nodes[2].extraMounts[3].containerPath = \"/tmp/dags/metadata\"  |
+.nodes[3].extraMounts[3].hostPath = \"$LOCAL_METADATA_FOLDER\" |
+.nodes[3].extraMounts[3].containerPath = \"/tmp/dags/metadata\" |
+.nodes[1].extraMounts[4].hostPath = \"$LOCAL_DBT_FOLDER\" |
+.nodes[1].extraMounts[4].containerPath = \"/tmp/dags/dbt\"  |
+.nodes[2].extraMounts[4].hostPath = \"$LOCAL_DBT_FOLDER\" |
+.nodes[2].extraMounts[4].containerPath = \"/tmp/dags/dbt\"  |
+.nodes[3].extraMounts[4].hostPath = \"$LOCAL_DBT_FOLDER\" |
+.nodes[3].extraMounts[4].containerPath = \"/tmp/dags/dbt\"
+" kind-cluster.yaml
+
+yq -i ".airflowVersion = \"${AIRFLOW_VERSION}\"" values.yaml
+yq -i ".env[1].value = env(GCP_PROJECT)" values.yaml
+export connection_string="google-cloud-platform://"
+echo $connection_string
+echo $GCP_PROJECT
+yq -i ".env[0].value = env(connection_string)" values.yaml
+yq -i ".env[3].value = env(GCP_PROJECT)" values.yaml
+yq -i ".env[4].value = env(LOCAL)" values.yaml
+
+
+# CREATE KUBE CLUSTER
+kind get clusters | grep airflow-cluster ||
+kind create cluster --name airflow-cluster --config kind-cluster.yaml
+
+kind load docker-image airflow_local:latest --name airflow-cluster
+kind load docker-image dbt_local:latest --name airflow-cluster
+
+## CHECK AIRFLOW NAMESPACE AND CREATE AIRFLOW NAMESPACE
+kubectl get namespaces | grep airflow || kubectl create namespace airflow
+
+## CREATE WEBSERVER SECRET (FERNET KEY)
+kubectl -n airflow create secret generic my-webserver-secret --from-literal="webserver-secret-key=$(python3 -c 'import secrets; print(secrets.token_hex(16))')" || echo "Secret Exists"
+
+## CREATE PERSISTENT VOLUME AND CLAIM FOR DAGS
+kubectl apply -f dags_volume.yaml
+kubectl apply -f credentials_volume.yaml
+
+## FETCH LATEST HELM CHART VERSION AND INSTALL AIRFLOW
+helm repo add apache-airflow https://airflow.apache.org
+helm repo update
+helm search repo airflow
+helm upgrade --install airflow apache-airflow/airflow --namespace airflow --debug -f values.yaml --timeout 20m0s
+
+# ENABLE PORT FORWARDING WHEN CLUSTER IS UP
+while [[ $(kubectl get  pods --namespace airflow  -o json \
+| jq '.items[] | select(.metadata.name | startswith("airflow-webserver"))| .status.containerStatuses[] | select(.name == "webserver") | .ready') \
+!= "true" ]]; do
+  echo "Waiting for webserver to become available..."
+  sleep 10
+done
+kubectl port-forward svc/airflow-webserver 8080:8080 --namespace airflow > /dev/null &
+
+# SET PAUSED DAGS TO CORRECT STATE
+(cd ${CURRENTDIR} && python -m pipelines.shared.pause_and_unpause_dags)

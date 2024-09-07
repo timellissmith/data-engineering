@@ -1,0 +1,181 @@
+{
+  "schema_version": "v1",
+  "dataset_name": "census public",
+  "dataset_supplier": "Data Engineering",
+  "dataset_search_keywords": "end-to-end-test",
+  "dataset_domain": "TEST",
+  "airflow_variables": {
+    "enable_sensors": true,
+    "owner": "End-to-end Tests"
+  },
+  "dataset_series": [
+    {
+      "series_name": "census",
+      "series_security_classification": "GREEN",
+      "series_source": {
+        "file_path": "",
+        "datasource": "csv",
+        "file_quote_character": "\"",
+        "file_is_code_list": false,
+        "file_number_header_records": 1,
+        "file_number_footer_records": 0,
+        "file_is_compressed": false,
+        "file_character_encoding": "UTF-8",
+        "file_checksum_type": "MD5"
+      },
+      "series_columns": [
+        {
+          "column_name": "key",
+          "column_description": "reference_key",
+          "column_is_pii": false,
+          "column_data_type": "STRING",
+          "column_format": "",
+          "column_is_pk": true,
+          "column_is_fk": false,
+          "column_nullable": false,
+          "column_null_value": true
+        },
+        {
+          "column_name": "population",
+          "column_description": "Total Population",
+          "column_is_pii": false,
+          "column_data_type": "STRING",
+          "column_format": "",
+          "column_is_pk": false,
+          "column_is_fk": false,
+          "column_nullable": true,
+          "column_null_value": ""
+        },
+        {
+          "column_name": "population_male",
+          "column_description": "Male population",
+          "column_is_pii": true,
+          "column_data_type": "STRING",
+          "column_format": "",
+          "column_is_pk": false,
+          "column_is_fk": false,
+          "column_nullable": false,
+          "column_null_value": ""
+        },
+        {
+          "column_name": "population_female",
+          "column_description": "Female population",
+          "column_is_pii": false,
+          "column_data_type": "STRING",
+          "column_format": "",
+          "column_is_pk": false,
+          "column_is_fk": false,
+          "column_nullable": false,
+          "column_null_value": ""
+        },
+        {
+          "column_name": "population_age_00_09",
+          "column_description": "Population under 10",
+          "column_is_pii": false,
+          "column_data_type": "STRING",
+          "column_format": "",
+          "column_is_pk": false,
+          "column_is_fk": false,
+          "column_nullable": false,
+          "column_null_value": ""
+        },
+        {
+          "column_name": "population_age_10_19",
+          "column_description": "Population between 10 and 20",
+          "column_is_pii": false,
+          "column_data_type": "STRING",
+          "column_length": "10",
+          "column_format": "",
+          "column_is_pk": false,
+          "column_is_fk": false,
+          "column_nullable": false,
+          "column_null_value": ""
+        },
+        {
+          "column_name": "population_age_20_29",
+          "column_description": "Population between 20 and 30",
+          "column_is_pii": false,
+          "column_data_type": "STRING",
+          "column_length": "10",
+          "column_format": "",
+          "column_is_pk": false,
+          "column_is_fk": false,
+          "column_nullable": false,
+          "column_null_value": ""
+        },
+        {
+          "column_name": "population_age_30_39",
+          "column_description": "Population between 30 and 40",
+          "column_is_pii": false,
+          "column_data_type": "STRING",
+          "column_length": "10",
+          "column_format": "",
+          "column_is_pk": false,
+          "column_is_fk": false,
+          "column_nullable": false,
+          "column_null_value": ""
+        },
+        {
+          "column_name": "population_age_40_49",
+          "column_description": "Population between 40 and 50",
+          "column_is_pii": false,
+          "column_data_type": "STRING",
+          "column_length": "10",
+          "column_format": "",
+          "column_is_pk": false,
+          "column_is_fk": false,
+          "column_nullable": false,
+          "column_null_value": ""
+        },
+        {
+          "column_name": "population_age_50_59",
+          "column_description": "Population between 50 and 60",
+          "column_is_pii": false,
+          "column_data_type": "STRING",
+          "column_length": "10",
+          "column_format": "",
+          "column_is_pk": false,
+          "column_is_fk": false,
+          "column_nullable": false,
+          "column_null_value": ""
+        },
+        {
+          "column_name": "population_age_60_69",
+          "column_description": "Population between 60 and 70",
+          "column_is_pii": false,
+          "column_data_type": "STRING",
+          "column_length": "10",
+          "column_format": "",
+          "column_is_pk": false,
+          "column_is_fk": false,
+          "column_nullable": false,
+          "column_null_value": ""
+        },
+        {
+          "column_name": "population_age_70_79",
+          "column_description": "Population between 70 and 80",
+          "column_is_pii": false,
+          "column_data_type": "STRING",
+          "column_length": "10",
+          "column_format": "",
+          "column_is_pk": false,
+          "column_is_fk": false,
+          "column_nullable": false,
+          "column_null_value": ""
+        },
+        {
+          "column_name": "population_age_80_and_older",
+          "column_description": "Population over 80",
+          "column_is_pii": false,
+          "column_data_type": "STRING",
+          "column_length": "10",
+          "column_format": "",
+          "column_is_pk": false,
+          "column_is_fk": false,
+          "column_nullable": false,
+          "column_null_value": ""
+        }
+      ]
+    }
+  ]
+}

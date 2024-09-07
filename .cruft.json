@@ -1,0 +1,33 @@
+{
+  "template": "/Users/timellis-smith/workspace/cookiecutter-data-engineering",
+  "commit": "3a8288142c3a9bc54e610ab9e760eaafe452fbf4",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "cts_data_engineering",
+      "license": "MIT",
+      "description": "Python package build from cookiecutter",
+      "authors": "CTS",
+      "gcp_project": "cookie-cutter-testing",
+      "location": "europe-west2",
+      "airflow_version": "2.3.3",
+      "include_terraform": "True",
+      "include_testdata": "True",
+      "include_pyspark": "True",
+      "include_dbt": "True",
+      "include_buildimages": "True",
+      "_copy_without_render": [
+        "dbt",
+        "build_images",
+        "credentials",
+        "metadata",
+        "pipelines",
+        "pyspark",
+        "scripts",
+        "tests"
+      ],
+      "_template": "/Users/timellis-smith/workspace/cookiecutter-data-engineering"
+    }
+  },
+  "directory": null
+}

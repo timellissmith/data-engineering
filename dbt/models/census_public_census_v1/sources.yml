@@ -1,0 +1,6 @@
+sources:
+- name: census_public
+  schema: census_public
+  tables:
+  - name: census_v1
+version: 2
