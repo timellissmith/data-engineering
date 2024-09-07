@@ -4,8 +4,8 @@ export root_dir := ${airflow_dir}/../
 export LOCAL_DAGS_FOLDER=${airflow_dir}/
 export LOCAL_DBT_FOLDER=${airflow_dir}/../dbt/
 export CREDENTIALS_PATH=${HOME}/.config/gcloud
-export AIRFLOW_VERSION=2.3.3
-export AIRFLOW_TAG=apache/airflow:2.3.3-python3.8
+export AIRFLOW_VERSION=2.10.1
+export AIRFLOW_TAG=apache/airflow:2.10.1-python3.12
 export LOCAL_TESTS=True
 export LOCAL_METADATA_FOLDER=$(airflow_dir)/../metadata/
 

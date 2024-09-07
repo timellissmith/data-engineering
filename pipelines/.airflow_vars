@@ -1,4 +1,4 @@
 export LOCAL_DAGS_FOLDER=$(pwd)/pipelines/dags
 export LOCAL_DBT_FOLDER=$(pwd)/
-export AIRFLOW_VERSION=2.2.5
+export AIRFLOW_VERSION=2.10.1
 export CREDENTIALS_PATH=${HOME}/.config/gcloud
