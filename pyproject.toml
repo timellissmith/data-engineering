@@ -37,7 +37,7 @@ apache-airflow = {extras = ["gcp"], version = "^2.10.1"}
 apache-airflow-providers-google = "^10.22.0"
 
 [tool.coverage.paths]
-source = ["cts_data_engineering"]
+source = ["sample_data_engineering"]
 
 [tool.coverage.run]
 branch = true
