@@ -4,8 +4,10 @@
 
 import logging
 from importlib import import_module
+from typing import Optional
 
 from fire import Fire
+
 from pipelines.dags.main_ingestion_operator.dbt_schema import Model
 from scripts.python_helpers.helpers import (deploy_sql_files, list_sql_files,
                                             search_and_filter_model_files,
@@ -54,8 +56,8 @@ def create_full_model(model: Model):
 def process_all_models(
     project: str,
     allow_empty_run: bool = True,
-    directory: str = None,
-    airflow_dags_dir: str = None,
+    directory: Optional[str] = None,
+    airflow_dags_dir: Optional[str] = None,
 ) -> None:
     """
     Process all models in the directory.

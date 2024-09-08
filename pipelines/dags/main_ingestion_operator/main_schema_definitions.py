@@ -6,8 +6,7 @@ from typing import List, Union
 
 from attr import define, field, validators  # type: ignore
 from pendulum import yesterday
-from pipelines.dags.main_ingestion_operator.dbt_schema import (
-    DbtTable, Model, PiiRedactionVars, Source, SourceTable)
+
 from pipelines.shared.converters import (convert_to_dataset_name,
                                          split_keywords, version_to_int)
 from pipelines.shared.validators import (check_for_duplicate_col_names,
@@ -17,7 +16,6 @@ from pipelines.shared.validators import (check_for_duplicate_col_names,
 VALID_TYPES = ["STRING", "INTEGER", "DECIMAL"]
 VALID_CLASSIFICATIONS = ["RED", "ORANGE", "GREEN"]
 VALID_SOURCES = ["avro", "parquet", "oracle", "mssql", "csv"]
-
 
 
 @define(frozen=True)
@@ -39,6 +37,7 @@ class AirflowVariables:
 @define()
 class Schema:
     """Define the schema of a column."""
+
     column_name: str = field(
         validator=[validators.instance_of(str), validate_column_name]
     )
@@ -53,6 +52,8 @@ class Schema:
 
 @define
 class SeriesSource:
+    """Define the source of the data."""
+
     file_path: str
     datasource: str = field(validator=[validators.in_(VALID_SOURCES)])
     file_quote_character: str = field(default="\"")

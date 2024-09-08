@@ -1,17 +1,17 @@
 """Simple DAG to handle GCS object to BigQuery."""
 import os
-from datetime import date, datetime
 
 from airflow.decorators import task
 from airflow.models.dag import DAG
-
 from airflow.providers.google.cloud.hooks.gcs import GCSHook
 from airflow.providers.google.cloud.sensors.gcs import \
     GCSObjectsWithPrefixExistenceSensor
-from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
+from airflow.providers.google.cloud.transfers.gcs_to_bigquery import \
+    GCSToBigQueryOperator
 from airflow.providers.google.cloud.transfers.gcs_to_gcs import \
     GCSToGCSOperator
 from airflow.sensors.base import PokeReturnValue
+
 from pipelines.dags.main_ingestion_operator.main_schema_definitions import \
     MainIngestionDag
 from pipelines.shared.dag_loaders import generate_dags
@@ -86,7 +86,7 @@ def create_dag(dag_config: MainIngestionDag) -> DAG:
                 if hook.exists("tims-random-bucket", "yet_another_cat_pick.jpg"):
                     return PokeReturnValue(is_done=True, xcom_value="")
 
-        insert_into_bq >>  [move_to_archive, move_to_unprocessed]
+        insert_into_bq >> [move_to_archive, move_to_unprocessed]
     return dag
 
 

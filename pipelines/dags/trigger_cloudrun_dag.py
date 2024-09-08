@@ -2,6 +2,7 @@
 
 from airflow.models import DAG
 from airflow.utils import dates
+
 from pipelines.custom_operators.trigger_cloudrun import RunCloudbuildOperator
 
 args = {
