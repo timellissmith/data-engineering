@@ -20,10 +20,10 @@ fi
 
 if [[ $(uname -a | grep arm64) ]]; then
   docker buildx build --platform linux/arm64 -t airflow_local:latest . --build-arg AIRFLOW_TAG=${AIRFLOW_TAG}
-  docker buildx build --platform linux/arm64 -t dbt_local:latest ../../build_images/dbt
+#  docker buildx build --platform linux/arm64 -t dbt_local:latest ../../build_images/dbt
 else
   docker buildx build -t airflow_local:latest . --build-arg AIRFLOW_TAG=${AIRFLOW_TAG}
-  docker buildx build -t dbt_local:latest ../../build_images/dbt
+#  docker buildx build -t dbt_local:latest ../../build_images/dbt
 fi
 
 cp kind-cluster-template.yaml kind-cluster.yaml
@@ -72,7 +72,7 @@ kind get clusters | grep airflow-cluster ||
 kind create cluster --name airflow-cluster --config kind-cluster.yaml
 
 kind load docker-image airflow_local:latest --name airflow-cluster
-kind load docker-image dbt_local:latest --name airflow-cluster
+#kind load docker-image dbt_local:latest --name airflow-cluster
 
 ## CHECK AIRFLOW NAMESPACE AND CREATE AIRFLOW NAMESPACE
 kubectl get namespaces | grep airflow || kubectl create namespace airflow

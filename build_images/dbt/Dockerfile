@@ -2,7 +2,7 @@ FROM python:3.10
 
 LABEL maintainer="Tim Ellis-Smith"
 
-ARG DBT_VERSION="1.2"
+ARG DBT_VERSION="1.8.6"
 
 RUN apt-get update
 RUN apt-get install -y git libpq-dev libblas-dev liblapack-dev gfortran libatlas-base-dev

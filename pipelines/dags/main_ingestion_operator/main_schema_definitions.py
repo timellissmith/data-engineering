@@ -110,8 +110,6 @@ class MainIngestionDag:
         self.source_bucket = f"{self.project}-{self.dataset_dash}-source"
         self.unprocessed_bucket = f"{self.project}-{self.dataset_dash}-unprocessed"
         self.archive_bucket = f"{self.project}-{self.dataset_dash}-archive"
-        self.code_bucket = f"{self.project}-code"
-        self.temp_bucket = f"{self.project}-temp"
         self.schema_string = ",".join(
             [f"{col.column_name} {col.column_data_type}" for col in self.series_columns]
         )

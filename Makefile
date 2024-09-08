@@ -4,7 +4,7 @@ VENV_NAME?=.venv
 FEATURES=tests/bdd/features/
 export CURRENTDIR =  $(shell pwd)
 export CURRENT_UID := $(shell id -u)
-export GCP_PROJECT := cookie-cutter-testing
+export GCP_PROJECT := sample-data-engineering
 export LOCAL=Please # can be any value provided it exists # TODO: Currently bools cause problems, find a way around this.
 export LOCATION := europe-west2
 
@@ -17,7 +17,7 @@ help:  ## Display the help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 unit_test: ## To run all pytests.
-	pytest -s -v
+	pytest -s -v --ignore pipelines/composer-local-dev
 
 dbt_create_models:  ## Create DBT models from metadata
 	PYTHONPATH=${CURRENTDIR} ./scripts/write_model_to_dbt ${GCP_PROJECT} --airflow_dags_dir=metadata
