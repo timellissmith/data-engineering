@@ -1,7 +1,6 @@
 """Helpers for write dbt models script."""
 
 
-import contextlib
 import logging
 from os import listdir, makedirs, walk
 from os.path import isdir, join, splitext
@@ -14,12 +13,13 @@ try:
 except ModuleNotFoundError:
     from attr import asdict  # type: ignore
 
+from yaml import safe_dump  # type: ignore
+
 from pipelines.dags.main_ingestion_operator.dbt_schema import (DbtTable, Model,
                                                                ModelTypes,
                                                                Source,
                                                                SourceTable)
 from pipelines.shared.dag_loaders import generate_dags
-from yaml import safe_dump  # type: ignore
 
 
 def make_model_directory(model_name: str) -> None:
@@ -241,6 +241,6 @@ def search_in_airflow_dags(airflow_dags_dir: str, project: str) -> List[Model]:
             )
             for dag in dags:
                 print(f"{dir(dag)}")
-                with contextlib.suppress(AttributeError):
-                    models.append(dag.dbt_model)
+                # with contextlib.suppress(AttributeError):
+                #     models.append(dag.dbt_model)
     return models

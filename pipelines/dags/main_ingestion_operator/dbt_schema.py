@@ -7,7 +7,12 @@ from attr import field, frozen  # type: ignore
 
 @frozen
 class DataTest:
-    """Schema for tests."""
+    """Schema for tests.
+
+    Args:
+        name: The name of the test.
+        parameters: The parameters of the test.
+    """
 
     name: str
     parameters: Dict[str, Any]

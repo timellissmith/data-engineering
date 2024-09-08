@@ -3,17 +3,17 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "cts_data_engineering"
+name = "sample_data_engineering"
 version = "0.1.0"
 description = "Python package build from cookiecutter"
-authors = ["CTS"]
+authors = ["Tim Ellis-Smith"]
 license = "MIT"
 
 [tool.poetry.scripts]
-"cts_data_engineering" = "cts_data_engineering:main"
+"sample_data_engineering" = "sample_data_engineering:main"
 
 [tool.poetry.dependencies]
-python = ">=3.12"
+python = ">=3.12,<3.13"
 fire = "^0.6.0"
 pyyaml = "^6.0.2"
 attrs = "^24.2.0"
@@ -31,12 +31,24 @@ ipython = "^8.7.0"
 pre-commit = "^2.20.0"
 
 
+[tool.poetry.group.dev.dependencies]
+commitizen = "^3.29.0"
+apache-airflow = {extras = ["gcp"], version = "^2.10.1"}
+apache-airflow-providers-google = "^10.22.0"
+
 [tool.coverage.paths]
-source = ["cts_data_engineering"]
+source = ["sample_data_engineering"]
 
 [tool.coverage.run]
 branch = true
-source = ["cts_data_engineering"]
+source = ["sample_data_engineering"]
 
 [tool.coverage.report]
 show_missing = true
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "$version"
+version_scheme = "pep440"
+version_provider = "poetry"
+update_changelog_on_bump = true

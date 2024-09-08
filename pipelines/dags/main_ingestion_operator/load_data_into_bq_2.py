@@ -1,12 +1,10 @@
 """Simple DAG to handle GCS object to BigQuery."""
 import os
-from datetime import date, datetime
 
 from airflow.decorators import task
 from airflow.models.dag import DAG
-from airflow.providers.google.cloud.sensors.gcs import \
-    GCSObjectsWithPrefixExistenceSensor
-from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
+from airflow.providers.google.cloud.transfers.gcs_to_bigquery import \
+    GCSToBigQueryOperator
 from airflow.providers.google.cloud.transfers.gcs_to_gcs import \
     GCSToGCSOperator
 from airflow.utils.dag_parsing_context import get_parsing_context
@@ -72,8 +70,7 @@ def create_dag(dag_config: MainIngestionDag) -> DAG:
                     statement = (f"\tPARSE_DATE({col.column_format, col.column_name}")
                 column_statements += statement
             end_sql = "FROM "
-            full_sql = starting_statement + "\n".join(column_statements) + end_sql
-
+            return starting_statement + "\n".join(column_statements) + end_sql
 
         move_to_archive = GCSToGCSOperator(
             task_id="move_to_archive",
@@ -84,24 +81,24 @@ def create_dag(dag_config: MainIngestionDag) -> DAG:
             move_object=True,
         )
 
-        move_to_unprocessed = GCSToGCSOperator(
-            task_id="move_to_unprocessed",
-            source_bucket=dag_config.source_bucket,
-            source_objects=[f"{dag_config.series_name}/*"],
-            destination_bucket=dag_config.unprocessed_bucket,
-            destination_object="census_unprocessed.csv",
-            trigger_rule="all_failed",
-            move_object=True,
-        )
-        if dag_config.airflow_variables.enable_sensors:
-            wait_for_files = GCSObjectsWithPrefixExistenceSensor(
-                task_id="wait_for_files",
-                bucket=dag_config.source_bucket,
-                prefix=dag_config.series_name,
-                deferrable=True
-            )
+        # move_to_unprocessed = GCSToGCSOperator(
+        #     task_id="move_to_unprocessed",
+        #     source_bucket=dag_config.source_bucket,
+        #     source_objects=[f"{dag_config.series_name}/*"],
+        #     destination_bucket=dag_config.unprocessed_bucket,
+        #     destination_object="census_unprocessed.csv",
+        #     trigger_rule="all_failed",
+        #     move_object=True,
+        # )
+        # if dag_config.airflow_variables.enable_sensors:
+        #     wait_for_files = GCSObjectsWithPrefixExistenceSensor(
+        #         task_id="wait_for_files",
+        #         bucket=dag_config.source_bucket,
+        #         prefix=dag_config.series_name,
+        #         deferrable=True
+        #     )
 
-        generate_raw_schema() >> load_raw_file
+        generate_raw_schema() >> load_raw_file >> move_to_archive
     return dag
 
 

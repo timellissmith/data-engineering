@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 
 import pytest
+
 from pipelines.shared.dag_loaders import (
     flatten_and_get_dag, get_dags_to_pause, get_dags_to_unpause, get_directory,
     get_paused_or_unpaused_dags_from_config)

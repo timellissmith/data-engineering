@@ -2,6 +2,7 @@
 
 
 import pytest
+
 from pipelines.shared.validators import (check_for_duplicate_col_names,
                                          is_greater_than_one,
                                          validate_column_name)

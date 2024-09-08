@@ -12,7 +12,6 @@ export LOCATION := europe-west2
 .DEFAULT_GOAL := help
 
 -include pipelines/Makefile
--include pyspark/Makefile
 
 help:  ## Display the help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -26,9 +25,6 @@ dbt_create_models:  ## Create DBT models from metadata
 create_new_branch: ## Create a new branch for hotfix, bugfixes or features
 	@scripts/create_new_branch.sh
 
-run_terraform:  ## Run a terraform deploy
-	cd terraform_cdk; PYTHONPATH=${CURRENTDIR} cdktf deploy
-
 run_precommit_checks:  ## Run pre-commit checks
 	@pre-commit run --all-files
 
@@ -38,4 +34,4 @@ enable_private_subnet_network_access:  ## Enable private network access
 copy_sample_files_into_place:  ## Copy any sample files into place
 	@gsutil cp testdata/census.csv gs://cookie-cutter-testing-census-public-source/census_v1/census.csv
 
-spin_everything_up: run_terraform enable_private_subnet_network_access pyspark_build dbt_create_models start_local_airflow copy_sample_files_into_place  ## Set up the project to with all the services
+spin_everything_up: run_terraform enable_private_subnet_network_access dbt_create_models start_local_airflow copy_sample_files_into_place  ## Set up the project to with all the services

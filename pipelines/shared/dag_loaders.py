@@ -8,6 +8,7 @@ from typing import List, Set, Tuple, Union
 
 import yaml  # type: ignore
 from cattr import structure
+
 from pipelines.dags.main_ingestion_operator.main_schema_definitions import \
     MainIngestionDag
 from pipelines.shared.airflow_utils import query_airflow
