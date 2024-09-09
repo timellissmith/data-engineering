@@ -1,7 +1,7 @@
 """Helpers for write dbt models script."""
-
-
+import contextlib
 import logging
+import os
 from os import listdir, makedirs, walk
 from os.path import isdir, join, splitext
 from pathlib import Path
@@ -22,14 +22,15 @@ from pipelines.dags.main_ingestion_operator.dbt_schema import (DbtTable, Model,
 from pipelines.shared.dag_loaders import generate_dags
 
 
-def make_model_directory(model_name: str) -> None:
+def make_model_directory(model_name: str, dest_dir: str) -> None:
     """
     Create a directory for the model to reside in.
 
     Args:
         model_name: The name of the model
+        dest_dir: the directory to write the model
     """
-    makedirs(f"dbt/models/{model_name}", mode=0o755, exist_ok=True)
+    makedirs(f"{dest_dir}/{model_name}", mode=0o755, exist_ok=True)
 
 
 def list_sql_files(tables: List[DbtTable]) -> List[str]:
@@ -45,22 +46,24 @@ def list_sql_files(tables: List[DbtTable]) -> List[str]:
     return [table.sql for table in tables]
 
 
-def deploy_sql_files(model_name: str, sql_files: List[str]) -> None:
+def deploy_sql_files(model_name: str, sql_files: List[str],
+                     dest_dir: str) -> None:
     """
     Copy SQL files into place.
 
     Args:
         model_name: the name of the model (used to determine directory structure)
         sql_files: the sql files relating to the model
+        dest_dir: the directory to write the model
 
     Returns: None
 
     """
     logging.info("Deploying SQL files")
-    make_model_directory(model_name)
+    make_model_directory(model_name, dest_dir=dest_dir)
     for file in sql_files:
         copyfile(
-            f"pipelines/sql/{file}", f"dbt/models/{model_name}/{model_name}_{file}"
+            f"pipelines/sql/{file}", f"{dest_dir}/{model_name}/{model_name}_{file}"
         )
 
 
@@ -94,19 +97,20 @@ def construct_model_yaml(model: Model) -> List[Dict[str, Any]]:
     return result
 
 
-def write_model_configuration(model: Model) -> None:
+def write_model_configuration(model: Model, dest_dir: str) -> None:
     """
     Update the config with the model information to be written.
 
     Args:
         model: the model to be added to the config
+        dest_dir: the directory to write the model
 
     Returns: None
     """
-    make_model_directory(model.name)
+    make_model_directory(model.name, dest_dir=dest_dir)
     logging.info("Updating models")
     model_config = {"version": 2, "models": construct_model_yaml(model)}
-    with open(f"dbt/models/{model.name}/schema.yml", "w") as f:
+    with open(f"{dest_dir}/{model.name}/schema.yml", "w") as f:  # TODO: Remove hard-coding
         safe_dump(model_config, f)
 
 
@@ -125,17 +129,19 @@ def create_source_tables(tables: List[SourceTable]) -> List[Dict[Any, Any]]:
         if table.identifier:
             dict1["identifier"] = table.identifier
         dict1["name"] = table.name
+        dict1["external"] = {"options": {"format": "CSV"}}
         table_list.append(dict1)
     return table_list
 
 
-def write_source_table_configuration(sources: List[Source], model_name: str):
+def write_source_table_configuration(sources: List[Source], model_name: str, dest_dir: str):
     """
     Write the source table information.
 
     Args:
         sources: the list of sources
         model_name: the name of the model where the config file is to be written
+        dest_dir: the directory to write the model
 
     Returns: None
     """
@@ -148,12 +154,12 @@ def write_source_table_configuration(sources: List[Source], model_name: str):
             s_dict["database"] = source.database
         s_dict["tables"] = create_source_tables(source.source_tables)
         result["sources"].append(s_dict)  # type: ignore
-        with open(f"dbt/models/{model_name}/sources.yml", "w") as f:
+        with open(f"{dest_dir}/{model_name}/sources.yml", "w") as f:
             safe_dump(result, f)
 
 
 def write_variable_information(
-    variables: ModelTypes, sql_files: List[str], model_name: str
+    variables: ModelTypes, sql_files: List[str], model_name: str, dest_dir: str
 ):
     """
     Append the constructed variables to the list of variables already present.
@@ -162,15 +168,16 @@ def write_variable_information(
         variables: The variables dataclass
         sql_files: The files to be updated
         model_name: the name of the model (to prefix the variable name with)
+        dest_dir: the directory to write the model
 
     Returns: None
     """
-    make_model_directory(model_name)
+    make_model_directory(model_name, dest_dir=dest_dir)
     logging.info("Updating variables")
     for file in sql_files:
-        with open(f"dbt/models/{model_name}/{model_name}_{file}", "r") as f:
+        with open(f"{dest_dir}/{model_name}/{model_name}_{file}", "r") as f:  # TODO: Remove hard coding
             lines = f.readlines()
-        with open(f"dbt/models/{model_name}/{model_name}_{file}", "w") as f:
+        with open(f"{dest_dir}/{model_name}/{model_name}_{file}", "w") as f:  # TODO: Remove hard coding
             for line in lines:
                 for key, value in asdict(variables).items():
                     line = line.replace(f"$__{key}__", f"{value}")
@@ -237,10 +244,9 @@ def search_in_airflow_dags(airflow_dags_dir: str, project: str) -> List[Model]:
             logging.info(f"Processing file: {directory}")
             # TODO: Remove hard-coding
             dags = generate_dags(
-                f"/Users/timellis-smith/workspace/cookiecutter-data-engineering/{airflow_dags_dir}"
+                f"/Users/timothyellis-smith/workspace/data_engineering/{airflow_dags_dir}"
             )
             for dag in dags:
-                print(f"{dir(dag)}")
-                # with contextlib.suppress(AttributeError):
-                #     models.append(dag.dbt_model)
+                with contextlib.suppress(AttributeError):
+                    models.append(dag.dbt_model())
     return models

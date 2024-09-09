@@ -51,7 +51,7 @@ class PiiRedactionVars:
     """Specific variables for the PiiRedactionVars model type."""
 
     not_pii_data: str
-    table_source: str
+    # table_source: str
 
 
 ModelTypes = Union[PiiRedactionVars]

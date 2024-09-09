@@ -44,19 +44,19 @@ class EmptyListError(Exception):
         logging.error(self.message)
 
 
-def create_full_model(model: Model):
+def create_full_model(model: Model, dest_dir: str):
     """Create the full dbt model."""
-    write_model_configuration(model)
+    write_model_configuration(model, dest_dir=dest_dir)
     sql_files = list_sql_files(model.tables)
-    deploy_sql_files(model.name, sql_files)
-    write_variable_information(model.variables, sql_files, model.name)
-    write_source_table_configuration(model.sources, model.name)
+    deploy_sql_files(model.name, sql_files, dest_dir=dest_dir)
+    write_variable_information(model.variables, sql_files, model.name, dest_dir=dest_dir)
+    write_source_table_configuration(model.sources, model.name, dest_dir=dest_dir)
 
 
 def process_all_models(
     project: str,
     allow_empty_run: bool = True,
-    directory: Optional[str] = None,
+    directory: Optional[str] = "pipelines/dbt/models",
     airflow_dags_dir: Optional[str] = None,
 ) -> None:
     """
@@ -84,7 +84,8 @@ def process_all_models(
             raise EmptyListError()
     if airflow_dags_dir:
         models = search_in_airflow_dags(airflow_dags_dir, project)
-        [create_full_model(model) for model in models]
+        print(f"{models=}")
+        [create_full_model(model, dest_dir=directory) for model in models]
 
 
 if __name__ == "__main__":

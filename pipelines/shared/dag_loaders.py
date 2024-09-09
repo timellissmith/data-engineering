@@ -91,6 +91,7 @@ def parse_files(full_path: str = "", directory: str = "") -> List[Union[dict]]:
 def generate_dags(full_path: str = "", directory: str = "") -> List[MainIngestionDag]:
     """Generate the DAG config by finding files and loading the config into classes."""
     dags_list: List[MainIngestionDag] = []
+    print(f"{full_path=}")
     for item in parse_files(full_path, directory):
         dags_json = flatten_and_get_dag(item)
         dags_list.extend(structure(dag, MainIngestionDag) for dag in dags_json)

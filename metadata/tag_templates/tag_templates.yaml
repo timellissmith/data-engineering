@@ -1,8 +1,0 @@
-template_display_name: test template
-template_id: test_template
-tag_level: "TABLE"
-template_fields:
-  - field_name: dataset_domain
-    field_type: STRING
-    display_name: dataset_domain
-    description: The dataset domain

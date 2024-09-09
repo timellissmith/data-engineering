@@ -7,6 +7,8 @@ from typing import List, Union
 from attr import define, field, validators  # type: ignore
 from pendulum import yesterday
 
+from pipelines.dags.main_ingestion_operator.dbt_schema import Model, Source, DbtTable, SourceTable, ModelTypes, \
+    PiiRedactionVars
 from pipelines.shared.converters import (convert_to_dataset_name,
                                          split_keywords, version_to_int)
 from pipelines.shared.validators import (check_for_duplicate_col_names,
@@ -114,3 +116,22 @@ class MainIngestionDag:
             [f"{col.column_name} {col.column_data_type}" for col in self.series_columns]
         )
         self.table_name = f"{self.series_name}_v{self.schema_version}"
+
+    def dbt_model(self) -> Model:
+        return Model(variables=ModelTypes(PiiRedactionVars(not_pii_data="")),
+                     name=self.series_name,
+                     sources=[Source(
+                         database=self.project,
+                         name=self.series_name,
+                         source_tables=[SourceTable(
+                             name=self.series_name
+                         )]
+                     )],
+                     tables=[DbtTable(
+                         name=self.series_name,
+                         schema=self.dataset,
+                         sql="filter_pii_data.sql",
+                         materialized="table",
+                         description=self.description,
+                     )]
+                     )
