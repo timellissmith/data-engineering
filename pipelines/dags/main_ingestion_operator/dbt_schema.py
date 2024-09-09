@@ -51,7 +51,8 @@ class PiiRedactionVars:
     """Specific variables for the PiiRedactionVars model type."""
 
     not_pii_data: str
-    # table_source: str
+    table_source: str
+    dataset_source: str
 
 
 ModelTypes = Union[PiiRedactionVars]
@@ -67,6 +68,8 @@ class SourceTable:
     """
 
     name: str
+    source_format: str
+    source_location: str
     identifier: Optional[str] = None
 
 

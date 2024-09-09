@@ -63,7 +63,7 @@ def deploy_sql_files(model_name: str, sql_files: List[str],
     make_model_directory(model_name, dest_dir=dest_dir)
     for file in sql_files:
         copyfile(
-            f"pipelines/sql/{file}", f"{dest_dir}/{model_name}/{model_name}_{file}"
+            f"pipelines/sql/{file}", f"{dest_dir}/{model_name}/{model_name}.sql"
         )
 
 
@@ -110,7 +110,7 @@ def write_model_configuration(model: Model, dest_dir: str) -> None:
     make_model_directory(model.name, dest_dir=dest_dir)
     logging.info("Updating models")
     model_config = {"version": 2, "models": construct_model_yaml(model)}
-    with open(f"{dest_dir}/{model.name}/schema.yml", "w") as f:  # TODO: Remove hard-coding
+    with open(f"{dest_dir}/{model.name}/schema.yml", "w") as f:
         safe_dump(model_config, f)
 
 
@@ -129,7 +129,8 @@ def create_source_tables(tables: List[SourceTable]) -> List[Dict[Any, Any]]:
         if table.identifier:
             dict1["identifier"] = table.identifier
         dict1["name"] = table.name
-        dict1["external"] = {"options": {"format": "CSV"}}
+        dict1["external"] = {"options": {"format": table.source_format},
+                             "location": table.source_location}
         table_list.append(dict1)
     return table_list
 
@@ -175,10 +176,11 @@ def write_variable_information(
     make_model_directory(model_name, dest_dir=dest_dir)
     logging.info("Updating variables")
     for file in sql_files:
-        with open(f"{dest_dir}/{model_name}/{model_name}_{file}", "r") as f:  # TODO: Remove hard coding
+        with open(f"{dest_dir}/{model_name}/{model_name}.sql", "r") as f:
             lines = f.readlines()
-        with open(f"{dest_dir}/{model_name}/{model_name}_{file}", "w") as f:  # TODO: Remove hard coding
+        with open(f"{dest_dir}/{model_name}/{model_name}.sql", "w") as f:
             for line in lines:
+                print(f"{variables=}")
                 for key, value in asdict(variables).items():
                     line = line.replace(f"$__{key}__", f"{value}")
                 f.write(line)

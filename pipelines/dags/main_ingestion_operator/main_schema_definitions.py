@@ -6,6 +6,7 @@ from typing import List, Union
 
 from attr import define, field, validators  # type: ignore
 from pendulum import yesterday
+from pyarrow import schema
 
 from pipelines.dags.main_ingestion_operator.dbt_schema import Model, Source, DbtTable, SourceTable, ModelTypes, \
     PiiRedactionVars
@@ -94,11 +95,9 @@ class MainIngestionDag:
     unprocessed_bucket: str = field(default="", init=False)
     archive_bucket: str = field(default="", init=False)
     project_dataset_table: str = field(default="", init=False)
-    code_bucket: str = field(default="", init=False)
-    temp_bucket: str = field(default="", init=False)
-    schema_string: str = field(default="", init=False)
     dataset_dash: str = field(default="", init=False)
     table_name: str = field(default="", init=False)
+    standardised_project: str = field(default="", init=False)
 
     def __attrs_post_init__(self):
         """Define the variables post init."""
@@ -112,19 +111,22 @@ class MainIngestionDag:
         self.source_bucket = f"{self.project}-{self.dataset_dash}-source"
         self.unprocessed_bucket = f"{self.project}-{self.dataset_dash}-unprocessed"
         self.archive_bucket = f"{self.project}-{self.dataset_dash}-archive"
-        self.schema_string = ",".join(
-            [f"{col.column_name} {col.column_data_type}" for col in self.series_columns]
-        )
         self.table_name = f"{self.series_name}_v{self.schema_version}"
+        self.standardised_project = f"{self.project}-std"
 
     def dbt_model(self) -> Model:
-        return Model(variables=ModelTypes(PiiRedactionVars(not_pii_data="")),
+        return Model(variables=PiiRedactionVars(not_pii_data="\n\t,".join(col.column_name for col in self.series_columns if not col.column_is_pii),
+                                                table_source=self.table_name,
+                                                dataset_source=self.dataset),
                      name=self.series_name,
                      sources=[Source(
                          database=self.project,
                          name=self.series_name,
+                         schema=self.dataset,
                          source_tables=[SourceTable(
-                             name=self.series_name
+                             name=self.series_name,
+                             source_format=self.series_source.datasource,
+                             source_location=f"gs://{self.source_bucket}/*"
                          )]
                      )],
                      tables=[DbtTable(
@@ -133,5 +135,6 @@ class MainIngestionDag:
                          sql="filter_pii_data.sql",
                          materialized="table",
                          description=self.description,
+                         project=self.standardised_project
                      )]
                      )
