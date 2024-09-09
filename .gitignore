@@ -169,3 +169,5 @@ terraform_cdk/cdktf.out
 
 pythonProject
 pipelines/composer-local-dev
+pipelines/dbt/models
+pipelines/dbt/dbt_packages
